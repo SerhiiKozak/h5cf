@@ -18,7 +18,7 @@ class HealthCheckController extends Controller
             'db' => fn() => $this->checkDb(),
             'cache' => fn() => $this->checkRedis(),
             'queue' => fn() => $this->checkQueue(),
-            'storage' => fn() => $this->checkQueue(),
+            'storage' => fn() => $this->checkStorage(),
         ];
 
         $result = [];

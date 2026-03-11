@@ -5,6 +5,7 @@ services:
       context: .
       dockerfile: docker/php/Dockerfile
     container_name: h5cf_app
+    user: "1000:1000"
     volumes:
       - ./src:/var/www
     depends_on:
