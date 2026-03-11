@@ -1,0 +1,52 @@
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: h5cf_app
+    volumes:
+      - ./src:/var/www
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - h5cf
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: h5cf_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - h5cf
+
+  mysql:
+    image: mysql:8.4
+    container_name: h5cf_mysql
+    environment:
+      MYSQL_DATABASE: h5cf_db
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: h5cf_user
+      MYSQL_PASSWORD: h5cf_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - h5cf
+
+  redis:
+    image: redis:7-alpine
+    container_name: h5cf_redis
+    networks:
+      - h5cf
+
+volumes:
+  mysql_data:
+
+networks:
+  h5cf:
