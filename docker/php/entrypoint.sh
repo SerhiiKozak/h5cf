@@ -10,7 +10,8 @@ if [ ! -f ".env" ] && [ -f ".env.example" ]; then
 fi
 
 if [ ! -d "vendor" ]; then
-    composer install --no-interaction --prefer-dist
+    echo "Installing composer dependencies..."
+    composer install --no-interaction --prefer-dist --optimize-autoloader
 fi
 
 if ! grep -q "^APP_KEY=base64:" .env; then
