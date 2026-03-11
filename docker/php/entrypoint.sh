@@ -1,31 +1,39 @@
 #!/bin/sh
 
 set -e
+echo "ENTRYPOINT STARTED"
 
 cd /var/www
 
-# install dependencies if vendor missing
+if [ ! -f ".env" ] && [ -f ".env.example" ]; then
+    cp .env.example .env
+fi
+
 if [ ! -d "vendor" ]; then
     composer install --no-interaction --prefer-dist
 fi
 
-# generate app key if not exists
-if ! grep -q "APP_KEY=base64" .env; then
-    php artisan key:generate
+if ! grep -q "^APP_KEY=base64:" .env; then
+    php artisan key:generate --force
 fi
 
-# wait for mysql
 echo "Waiting for mysql..."
 
 until php -r "
 try {
-    new PDO('mysql:host=mysql;dbname=h5cf_db','h5cf_user','h5cf_pass');
+    new PDO(
+        'mysql:host=mysql;dbname=h5cf_db',
+        'h5cf_user',
+        'h5cf_pass',
+        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+    );
     echo 'connected';
-} catch (Exception \$e) {
+} catch (Throwable \$e) {
+    fwrite(STDERR, \$e->getMessage());
     exit(1);
 }
 "; do
-  sleep 2
+    sleep 2
 done
 
 echo "MySQL ready"

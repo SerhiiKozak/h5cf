@@ -22,7 +22,6 @@ src/storage/logs/*
 # Environment
 # -----------------------
 
-src/.env.*
 !src/.env.example
 
 # -----------------------
